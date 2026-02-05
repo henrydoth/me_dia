@@ -51,3 +51,7 @@ config/media_root.yml
 
 # generated index (local)
 data/index_media.csv
+
+# local only
+.quarto/
+MEDIA
