@@ -1,22 +1,90 @@
 ---
-title: "Media report"
+title: "Media Report"
 format: html
 execute:
   echo: false
 ---
 
+## Storage Analysis
+
+This report analyzes your indexed media files from the USB drive.
+
 ```{r}
 p <- 'data/index_media.csv'
-stopifnot(file.exists(p))
+if (!file.exists(p)) {
+  stop('Index file not found. Please run: source("R/01_scan_media.R")')
+}
+
 df <- read.csv(p)
 df$size_gb <- df$size / 1024^3
+df$size_mb <- df$size / 1024^2
+```
+
+### Summary Statistics
+
+```{r}
+cat('Total files:', nrow(df), '\n')
+cat('Total storage:', round(sum(df$size_gb), 2), 'GB\n')
+cat('Average file size:', round(mean(df$size_mb), 2), 'MB\n')
+cat('Largest file:', round(max(df$size_mb), 2), 'MB\n')
+```
+
+### Storage by Category
+
+```{r}
 agg <- aggregate(size_gb ~ category, df, sum)
 agg <- agg[order(-agg$size_gb), ]
-agg
+agg$size_gb <- round(agg$size_gb, 2)
+agg$percentage <- round(100 * agg$size_gb / sum(agg$size_gb), 1)
+colnames(agg) <- c('Category', 'Size (GB)', 'Percentage')
+knitr::kable(agg, row.names = FALSE)
 ```
+
+### File Count by Category
 
 ```{r}
 counts <- as.data.frame(table(df$category))
-names(counts) <- c('category','n_files')
-counts[order(-counts$n_files), ]
+names(counts) <- c('Category','File Count')
+counts <- counts[order(-counts$`File Count`), ]
+counts$Percentage <- round(100 * counts$`File Count` / sum(counts$`File Count`), 1)
+knitr::kable(counts, row.names = FALSE)
 ```
+
+### File Extensions
+
+```{r}
+ext_counts <- as.data.frame(table(df$ext))
+ext_counts <- ext_counts[order(-ext_counts$Freq), ]
+names(ext_counts) <- c('Extension', 'Count')
+head(ext_counts, 10) |> knitr::kable(row.names = FALSE, caption = "Top 10 File Extensions")
+```
+
+### Largest Files
+
+```{r}
+large_files <- df[order(-df$size), ]
+large_files <- large_files[1:min(10, nrow(large_files)), ]
+display <- data.frame(
+  File = basename(large_files$rel_path),
+  Category = large_files$category,
+  Size_MB = round(large_files$size_mb, 2),
+  Extension = large_files$ext
+)
+knitr::kable(display, row.names = FALSE, caption = "10 Largest Files")
+```
+
+### Recent Files
+
+```{r}
+df$mtime <- as.POSIXct(df$mtime)
+recent <- df[order(df$mtime, decreasing = TRUE), ]
+recent <- recent[1:min(10, nrow(recent)), ]
+display <- data.frame(
+  File = basename(recent$rel_path),
+  Category = recent$category,
+  Modified = format(recent$mtime, "%Y-%m-%d %H:%M"),
+  Size_MB = round(recent$size_mb, 2)
+)
+knitr::kable(display, row.names = FALSE, caption = "10 Most Recently Modified Files")
+```
+

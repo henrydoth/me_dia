@@ -5,14 +5,43 @@ execute:
   echo: false
 ---
 
+## Welcome to me_dia
+
+Cross-platform media file manager for MP4, MP3, and picture files across Mac and Windows USB platforms.
+
+### Getting Started
+
+If this is your first time:
+
+1. **Setup**: Run `source("R/00_setup.R")` in R
+2. **Configure**: Edit `config/media_root.yml` with your USB path
+3. **Scan**: Run `source("R/01_scan_media.R")` to index your media
+4. **View Reports**: This page and the Media Report tab
+
+For detailed instructions, see the [User Guide](cross_platform_guide.html).
+
+### Current Status
+
 ```{r}
 cat('Project root:', getwd(), '\n')
 p <- 'data/index_media.csv'
 if (file.exists(p)) {
   df <- read.csv(p)
-  cat('Indexed files:', nrow(df), '\n')
-  print(table(df$category))
+  cat('✅ Index file exists\n')
+  cat('📁 Total files indexed:', nrow(df), '\n')
+  cat('💾 Total size:', round(sum(df$size) / 1024^3, 2), 'GB\n\n')
+  
+  cat('File breakdown by category:\n')
+  tbl <- table(df$category)
+  for (cat in names(tbl)) {
+    cat('  ', cat, ': ', tbl[cat], ' files\n', sep='')
+  }
 } else {
-  cat('No index yet. Run: source("R/01_scan_media.R")\n')
+  cat('⚠️  No index file found yet.\n\n')
+  cat('To get started:\n')
+  cat('1. Run: source("R/00_setup.R")\n')
+  cat('2. Configure: config/media_root.yml\n')
+  cat('3. Scan: source("R/01_scan_media.R")\n')
 }
 ```
+
