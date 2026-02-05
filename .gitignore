@@ -45,3 +45,9 @@ media/
 *.png
 *.iso
 *.img
+
+# local only (deprecated)
+config/media_root.yml
+
+# generated index (local)
+data/index_media.csv

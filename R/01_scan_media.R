@@ -2,27 +2,19 @@
 # Scan MEDIA_ROOT (USB/External) and write data/index_media.csv
 
 suppressWarnings(suppressMessages({
-  if (!requireNamespace('yaml', quietly = TRUE)) stop('Please install.packages("yaml")')
   if (!requireNamespace('digest', quietly = TRUE)) stop('Please install.packages("digest")')
 }))
 
-cfg_path <- file.path('config', 'media_root.yml')
-if (!file.exists(cfg_path)) {
-  stop('Missing config/media_root.yml (local). Example:\n  media_root: "E:/MEDIA"')
-}
+source("config/media.R")
+MEDIA_ROOT <- media_root
 
-cfg <- yaml::read_yaml(cfg_path)
-MEDIA_ROOT <- cfg$media_root
-if (is.null(MEDIA_ROOT) || !dir.exists(MEDIA_ROOT)) {
-  stop('media_root is invalid or not found: ', MEDIA_ROOT)
-}
-
-MEDIA_DIRS <- c('mp_4','mp_3','pic_ture','r_m_d')
+MEDIA_DIRS <- c('video','audio','image','raw','export')
 ext_map <- list(
-  mp_4     = c('mp4','mkv','mov','avi'),
-  mp_3     = c('mp3','wav','flac'),
-  pic_ture = c('jpg','jpeg','png','heic','tif','tiff'),
-  r_m_d    = c('pdf','docx','xlsx','pptx','zip','rar','7z','raw','txt')
+  video  = c('mp4','mkv','mov','avi'),
+  audio  = c('mp3','wav','flac'),
+  image  = c('jpg','jpeg','png','heic','tif','tiff'),
+  raw    = c('pdf','docx','xlsx','pptx','zip','rar','7z','raw','txt'),
+  export = c('pdf','docx','xlsx','pptx','zip','rar','7z','raw','txt')
 )
 
 get_ext <- function(x) tolower(sub('.*\\.', '', x))
@@ -69,7 +61,18 @@ scan_one <- function(subdir) {
 
 df <- do.call(rbind, lapply(MEDIA_DIRS, scan_one))
 if (is.null(df) || nrow(df) == 0) {
-  stop('No files found. Check MEDIA_ROOT and folder names: mp_4/mp_3/pic_ture/r_m_d')
+  message('⚠️ No files found yet (folders are empty). Creating empty index.')
+  df <- data.frame(
+    category = character(),
+    rel_path = character(),
+    abs_path = character(),
+    ext      = character(),
+    size     = double(),
+    size_mb  = double(),
+    mtime    = character(),
+    md5      = character(),
+    stringsAsFactors = FALSE
+  )
 }
 
 out <- file.path('data', 'index_media.csv')
