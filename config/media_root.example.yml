@@ -1,0 +1,15 @@
+# Example configuration for media_root path
+# Copy this file to media_root.yml and customize for your system
+
+# WINDOWS EXAMPLES:
+# media_root: "E:/MEDIA"
+# media_root: "D:/MyUSB/MEDIA"
+# media_root: "F:/External/MEDIA"
+
+# MAC EXAMPLES:
+# media_root: "/Volumes/MyUSB/MEDIA"
+# media_root: "/Volumes/External/MEDIA"
+# media_root: "/Volumes/UNTITLED/MEDIA"
+
+# YOUR CONFIGURATION (uncomment and edit one of the above):
+media_root: "CHANGE_ME"

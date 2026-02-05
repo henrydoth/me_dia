@@ -1,0 +1,253 @@
+---
+title: "Cross-Platform User Guide"
+format: html
+---
+
+# Cross-Platform Media Management Guide
+
+This guide explains how to use **me_dia** across Mac and Windows systems with USB drives.
+
+## Quick Start
+
+### First Time Setup
+
+1. **Install Requirements**
+   - Install R and Quarto
+   - Open R/RStudio and run:
+   ```r
+   source("R/00_setup.R")
+   ```
+
+2. **Prepare Your USB Drive**
+   - Create a folder called `MEDIA` on your USB drive
+   - Inside `MEDIA`, create these folders:
+     - `mp_4/` - for video files
+     - `mp_3/` - for audio files  
+     - `pic_ture/` - for images
+     - `r_m_d/` - for documents
+
+3. **Find Your USB Path**
+   ```r
+   source("R/utils_detect_usb.R")
+   show_drives()
+   ```
+
+4. **Configure Media Root**
+   - Edit `config/media_root.yml`
+   - Set your USB path (see examples below)
+
+5. **Scan Your Media**
+   ```r
+   source("R/01_scan_media.R")
+   ```
+
+## Platform-Specific Instructions
+
+### Windows
+
+**Finding USB Drive:**
+- Open File Explorer (Windows + E)
+- Look for your USB under "This PC"
+- Note the drive letter (e.g., E:, F:, G:)
+
+**Configuration Example:**
+```yaml
+# config/media_root.yml
+media_root: "E:/MEDIA"
+```
+
+**Common Paths:**
+- `E:/MEDIA`
+- `F:/MEDIA` 
+- `D:/MyUSB/MEDIA`
+
+**Tips:**
+- Use forward slashes `/` in paths (not backslashes)
+- Drive letters can change when USB is reconnected
+- Safely eject USB from system tray before removing
+
+### Mac
+
+**Finding USB Drive:**
+- USB drives mount under `/Volumes/`
+- Open Finder → Locations → External drives
+- Or run in Terminal: `ls /Volumes/`
+
+**Configuration Example:**
+```yaml
+# config/media_root.yml
+media_root: "/Volumes/MyUSB/MEDIA"
+```
+
+**Common Paths:**
+- `/Volumes/MyUSB/MEDIA`
+- `/Volumes/External/MEDIA`
+- `/Volumes/UNTITLED/MEDIA` (unnamed USB)
+
+**Tips:**
+- Paths are case-sensitive
+- Use exact volume name as shown in Finder
+- Eject from Finder before removing USB
+
+## Workflow: Using Same USB on Both Systems
+
+The index file stores both **relative** and **absolute** paths, making it portable:
+
+### Scenario 1: Scan on Windows, View on Mac
+
+1. **On Windows PC:**
+   ```r
+   # Edit config with Windows path
+   # media_root: "E:/MEDIA"
+   source("R/01_scan_media.R")
+   ```
+   
+2. **Safely eject USB from Windows**
+
+3. **On Mac:**
+   ```r
+   # Edit config with Mac path  
+   # media_root: "/Volumes/MyUSB/MEDIA"
+   source("R/01_scan_media.R")  # Re-scan to update paths
+   ```
+
+### Scenario 2: Portable Index
+
+The `data/index_media.csv` uses relative paths like:
+- `mp_4/vacation/video.mp4`
+- `pic_ture/photos/sunset.jpg`
+
+These work regardless of the mount point (E:/ or /Volumes/MyUSB/)
+
+## Common Tasks
+
+### Check What's Detected
+
+```r
+source("R/utils_detect_usb.R")
+show_drives()
+```
+
+This shows:
+- Available drives/volumes
+- Which ones have MEDIA folders
+- Missing required subfolders
+
+### Re-scan After Adding Files
+
+```r
+source("R/01_scan_media.R")
+```
+
+### Generate Reports
+
+```bash
+quarto render
+```
+
+Or in RStudio: **Build → Render Website**
+
+### View Statistics
+
+Open `output/quarto/index.html` to see:
+- Total files indexed
+- Files by category
+- Storage usage
+
+## Troubleshooting
+
+### "media_root is invalid or not found"
+
+**Check:**
+1. Is USB drive connected?
+2. Is path correct in `config/media_root.yml`?
+3. Run `show_drives()` to see available paths
+
+**Windows:** Check File Explorer
+**Mac:** Run `ls /Volumes/` in Terminal
+
+### "No files found"
+
+**Verify:**
+1. Folders exist: `mp_4/`, `mp_3/`, `pic_ture/`, `r_m_d/`
+2. Files have correct extensions
+3. Folder names match exactly (case matters on Mac!)
+
+### Files Not Showing Up
+
+**Check file extensions:**
+- Videos: .mp4, .mkv, .mov, .avi
+- Audio: .mp3, .wav, .flac  
+- Images: .jpg, .jpeg, .png, .heic, .tif, .tiff
+- Docs: .pdf, .docx, .xlsx, .pptx, .zip, .rar, .7z, .txt
+
+### Drive Letter Changed (Windows)
+
+This is normal! Windows may assign different letters each time.
+
+**Solution:** Update `config/media_root.yml` with new letter and re-scan.
+
+### Case Sensitivity (Mac)
+
+Mac file systems are usually case-insensitive but case-preserving.
+
+**Folders must be named exactly:** `mp_4`, `mp_3`, `pic_ture`, `r_m_d`
+
+## File Organization Best Practices
+
+### Good Structure
+```
+MEDIA/
+├── mp_4/
+│   ├── 2024/
+│   │   └── vacation.mp4
+│   └── 2023/
+│       └── birthday.mov
+├── mp_3/
+│   ├── music/
+│   │   └── album/
+│   └── podcasts/
+├── pic_ture/
+│   ├── 2024/
+│   │   ├── jan/
+│   │   └── feb/
+│   └── screenshots/
+└── r_m_d/
+    ├── documents/
+    └── archives/
+```
+
+### Tips
+- Organize by date or category
+- Use descriptive folder names
+- Keep consistent structure
+- Don't mix file types across folders
+
+## Advanced: Multiple USB Drives
+
+You can manage multiple USB drives by:
+
+1. Create separate config files:
+   - `config/media_root_usb1.yml`
+   - `config/media_root_usb2.yml`
+
+2. Modify scan script to use different configs
+
+3. Keep separate index files:
+   - `data/index_usb1.csv`
+   - `data/index_usb2.csv`
+
+## Security Notes
+
+- Index files don't contain actual media (just metadata)
+- MD5 hashes verify file integrity
+- Config files with local paths are in `.gitignore`
+- Never commit actual media files to git
+
+## Support
+
+For issues or questions:
+- Check this guide
+- Review error messages carefully  
+- Verify USB connection and paths
+- Check file/folder names match exactly
