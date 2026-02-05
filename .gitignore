@@ -32,3 +32,16 @@ config/media_root.yml
 # OS
 .DS_Store
 Thumbs.db
+
+# ===== MEDIA (USB only) =====
+MEDIA/
+media/
+*.mp3
+*.mp4
+*.mkv
+*.wav
+*.jpg
+*.jpeg
+*.png
+*.iso
+*.img
