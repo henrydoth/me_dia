@@ -37,6 +37,14 @@ MEDIA_ROOT <- cfg$media_root
 
 # Validate media_root configuration
 if (is.null(MEDIA_ROOT) || MEDIA_ROOT == "CHANGE_ME") {
+  available_info <- if (OS == "windows") {
+    '  Check File Explorer for available drives (C:, D:, E:, etc.)\n'
+  } else if (OS == "mac") {
+    paste0('  Available volumes:\n  ', paste(list.files('/Volumes/', full.names = TRUE), collapse = '\n  '), '\n')
+  } else {
+    '  Check /mnt or /media directories\n'
+  }
+  
   stop(
     'Please configure media_root in config/media_root.yml\n',
     if (OS == "windows") {
@@ -46,14 +54,7 @@ if (is.null(MEDIA_ROOT) || MEDIA_ROOT == "CHANGE_ME") {
     } else {
       '  Example: media_root: "/mnt/usb/MEDIA"\n'
     },
-    '\nAvailable drives/volumes:\n',
-    if (OS == "windows") {
-      paste0('  ', paste(list.files('/', pattern = '^[A-Z]:$', full.names = TRUE), collapse = ', '))
-    } else if (OS == "mac") {
-      paste0('  ', paste(list.files('/Volumes/', full.names = TRUE), collapse = '\n  '))
-    } else {
-      '  Check /mnt or /media directories'
-    }
+    '\n', available_info
   )
 }
 
