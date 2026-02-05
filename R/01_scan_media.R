@@ -5,8 +5,6 @@ suppressWarnings(suppressMessages({
   if (!requireNamespace('digest', quietly = TRUE)) stop('Please install.packages("digest")')
 }))
 
-source("config/media.R")
-MEDIA_ROOT <- media_root
 
 MEDIA_DIRS <- c('video','audio','image','raw','export')
 ext_map <- list(
