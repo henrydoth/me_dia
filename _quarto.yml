@@ -10,6 +10,8 @@ website:
         text: Home
       - href: media_report.qmd
         text: Media report
+      - href: cross_platform_guide.qmd
+        text: User Guide
 
 format:
   html:

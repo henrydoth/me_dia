@@ -13,6 +13,10 @@ output/
 # Local config
 config/media_root.yml
 
+# Data directory (except .gitkeep)
+data/*.csv
+data/*.rds
+
 # Media big files (never commit)
 *.mp3
 *.mp4
