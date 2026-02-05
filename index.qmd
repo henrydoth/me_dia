@@ -1,0 +1,18 @@
+---
+title: "me_dia – Overview"
+format: html
+execute:
+  echo: false
+---
+
+```{r}
+cat('Project root:', getwd(), '\n')
+p <- 'data/index_media.csv'
+if (file.exists(p)) {
+  df <- read.csv(p)
+  cat('Indexed files:', nrow(df), '\n')
+  print(table(df$category))
+} else {
+  cat('No index yet. Run: source("R/01_scan_media.R")\n')
+}
+```

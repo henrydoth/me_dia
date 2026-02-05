@@ -1,0 +1,22 @@
+---
+title: "Media report"
+format: html
+execute:
+  echo: false
+---
+
+```{r}
+p <- 'data/index_media.csv'
+stopifnot(file.exists(p))
+df <- read.csv(p)
+df$size_gb <- df$size / 1024^3
+agg <- aggregate(size_gb ~ category, df, sum)
+agg <- agg[order(-agg$size_gb), ]
+agg
+```
+
+```{r}
+counts <- as.data.frame(table(df$category))
+names(counts) <- c('category','n_files')
+counts[order(-counts$n_files), ]
+```

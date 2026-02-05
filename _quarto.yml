@@ -1,0 +1,17 @@
+project:
+  type: website
+  output-dir: output/quarto
+
+website:
+  title: "me_dia"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: media_report.qmd
+        text: Media report
+
+format:
+  html:
+    toc: true
+    number-sections: false
